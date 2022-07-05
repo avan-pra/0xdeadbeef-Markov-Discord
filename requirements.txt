@@ -1,0 +1,4 @@
+discord.py
+websocket-client
+python-dotenv
+numpy
