@@ -17,22 +17,51 @@ channel_list = []
 
 @client.event
 async def on_message(message):
+	if message.author == client.user:
+		return
+
 	if message.content == "steakoverflow register channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				await message.channel.send('Error: channel already registered')
 				return
 		channel_list.append(message.channel)
+		print(get_current_time() + " registered channel " + message.channel.name)
 		await message.channel.send('Successfully registered channel')
 
 	if message.content == "steakoverflow unregister channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				channel_list.remove(stored_channel) # totally not optimized but erh
+				print(get_current_time() + " removed channel " + message.channel.name)
 				await message.channel.send('Successfully unregistered channel')
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
+	if 'florianne' in message.content and ('cava' in message.content or 'comment tu vas' in message.content or 'ca dit quoi' in message.content):
+		if message.author.name == 'Arth':
+			await message.channel.send('calme toi un peu')
+		if message.author.name == 'Flosh':
+			await message.channel.send('oui et toi mon croissant ?')
+		if message.author.name == 'florianne':
+			await message.channel.send('comment est-ce possible')
+		if message.author.name == 'Eudald':
+			await message.channel.send('Oui Hermano, et toi ?')
+		if message.author.name == 'louloucat':
+			await message.channel.send('https://reactjs.org/docs/')
+		if message.author.name == 'Azot':
+			await message.channel.send('https://tenor.com/view/apmtv3-elchiringuitodejugones-elchiringuito-pedrerol-tictac-gif-22917185')
+		if message.author.name == 'badria':
+			await message.channel.send('non badria je ne suis pas disponible les 3 prochains mois, prend RDV\n[Badria]: **ET J\'AI UN GUN**')
+		if message.author.name == 'shazam':
+			await message.channel.send('Plutot, je me demandais si je doit envoyer un message a vincent 🥺')
+		if message.author.name == 'Sp00n':
+			await message.channel.send('C\'est quand qu\'on voit Oksana 🥰')
+		if message.author.name == 'lucasmln':
+			await message.channel.send('Oh Lucas, cava mieux ?')
+		if message.author.name == 'jmdw':
+			await message.channel.send('Oui et toi Julien ? Tu as prepare ta 4eme dose ? https://www.sante.fr/cf/centres-vaccination-covid/departement-75-paris.html')
+	
 def get_current_time():
 	now = datetime.now()
 	current_time = now.strftime("%H:%M:%S")
