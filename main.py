@@ -38,7 +38,7 @@ async def on_message(message):
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
-	if 'florianne' in message.content and ('cava' in message.content or 'comment tu vas' in message.content or 'ca dit quoi' in message.content):
+	if 'florianne' in message.content and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
 		if message.author.name == 'Arth':
 			await message.channel.send('calme toi un peu')
 		if message.author.name == 'Flosh':
@@ -46,7 +46,7 @@ async def on_message(message):
 		if message.author.name == 'florianne':
 			await message.channel.send('comment est-ce possible')
 		if message.author.name == 'Eudald':
-			await message.channel.send('Oui Hermano, et toi ?')
+			await message.channel.send('Oui Hermano, et toi ? En Espagne il fait moins beau que sur mon balcon je suis sur')
 		if message.author.name == 'louloucat':
 			await message.channel.send('https://reactjs.org/docs/')
 		if message.author.name == 'Azot':
