@@ -84,7 +84,7 @@ def notify_channels():
 	slots = ["12h15", "12h30", "12h45", "13h00", "13h15", "13h30", "13h45"];
 	for channel in channel_list:
 		print(get_current_time() + ' notifying: ' + channel.name)
-		client.loop.create_task(channel.send('Le foodtruck est ouvert, ' + numpy.random.choice(slots, 1, p=[0.3, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1])[0] + ' vite !!! @everyone'))
+		client.loop.create_task(channel.send('Le foodtruck est ouvert, ' + numpy.random.choice(slots, 1, p=[0.1, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1])[0] + ' vite !!! @everyone'))
 
 def thread_ft():
 	food_truck_state = get_food_truck_state()
