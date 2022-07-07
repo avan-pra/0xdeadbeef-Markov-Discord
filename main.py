@@ -9,11 +9,13 @@ import threading
 import time
 import numpy
 from datetime import datetime
+import markov
 
 wsurl = "wss://steakoverflow.42paris.fr/sockjs/999/ow2ptczb/websocket"
 vmsg = '["{\\"msg\\":\\"connect\\",\\"version\\":\\"1\\",\\"support\\":[\\"1\\",\\"pre2\\",\\"pre1\\"]}"]'
 client = discord.Client()
 channel_list = []
+generator = markov.create('msg.txt')
 
 @client.event
 async def on_message(message):
@@ -38,7 +40,10 @@ async def on_message(message):
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
-	if 'florianne' in message.content and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
+	if message.content.lower() == "floe dis moi":
+		await message.channel.send(generator.get_sentence())
+
+	if 'florianne' in message.content.lower() and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
 		if message.author.name == 'Arth':
 			await message.channel.send('calme toi un peu')
 		if message.author.name == 'Flosh':

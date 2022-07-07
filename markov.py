@@ -78,6 +78,11 @@ class word:
 class awords:
 	'''contains all my words and manage them'''
 	words = []
+	s_word = None
+
+	def __init__(self):
+		words = []
+		s_word = None
 
 	def add(self, current, new):
 		# loop through all know words
@@ -101,15 +106,29 @@ class awords:
 				return w.get_next_word(word)
 		return None
 
+	def set_starting_words(self, s_word):
+		self.s_word = s_word
+
+	def get_sentence(self):
+		sentence = ''
+		word = self.s_word.get()
+		sentence = word + ' '
+		while True:
+			word = self.get_next_word(word)
+			if word == None:
+				break
+			sentence += (word + ' ')
+		return sentence
+
 	def printc(self):
 		for word in self.words:
 			word.printc()
 
-def main():
+def create(filename):
 	a_words = awords()	# contains all word class
 	s_word = sword()	# starting words
 
-	lines = open(sys.argv[1], 'r').readlines()
+	lines = open(filename, 'r').readlines()
 	# loop through all line in file
 	for line in lines:
 		line = line[:-1] # trim \n
@@ -130,15 +149,9 @@ def main():
 	# tell all registered words to calculate probabilty to be later used for get_next_word()
 	a_words.calculate_probabilites()
 	# a_words.printc()
-	word = s_word.get()
-	print(word + ' ', end='')
-	while True:
-		word = a_words.get_next_word(word)
-		if word == None:
-			break
-		print(word + ' ', end='')
-	print()
-
+	
+	a_words.set_starting_words(s_word)
+	return a_words
 
 if __name__ == "__main__":
-	main()
+	create()
