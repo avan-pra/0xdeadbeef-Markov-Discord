@@ -40,7 +40,7 @@ async def on_message(message):
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
-	if message.content.lower() == "floe dis moi":
+	if message.content.lower() == "floe":
 		await message.channel.send(generator.get_sentence())
 
 	if 'florianne' in message.content.lower() and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
