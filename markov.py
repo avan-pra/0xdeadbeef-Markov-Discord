@@ -6,6 +6,10 @@ import numpy
 class sword:
 	'''contains the probablity for the starting word'''
 	sword = {}
+	
+	def __init__(self):
+		self.sword = {}
+
 	def add(self, word):
 		# we already have this word as a starting word
 		if word in self.sword.keys():
@@ -81,8 +85,8 @@ class awords:
 	s_word = None
 
 	def __init__(self):
-		words = []
-		s_word = None
+		self.words = []
+		self.s_word = None
 
 	def add(self, current, new):
 		# loop through all know words
