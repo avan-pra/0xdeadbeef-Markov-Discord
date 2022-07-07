@@ -15,7 +15,8 @@ wsurl = "wss://steakoverflow.42paris.fr/sockjs/999/ow2ptczb/websocket"
 vmsg = '["{\\"msg\\":\\"connect\\",\\"version\\":\\"1\\",\\"support\\":[\\"1\\",\\"pre2\\",\\"pre1\\"]}"]'
 client = discord.Client()
 channel_list = []
-generator = markov.create('msg.txt')
+generator_floe = markov.create('floe.txt')
+generator_lou = markov.create('lou.txt')
 
 @client.event
 async def on_message(message):
@@ -41,7 +42,9 @@ async def on_message(message):
 		await message.channel.send('Error: could not find channel in the database')
 
 	if "floe" in message.content.lower():
-		await message.channel.send(generator.get_sentence())
+		await message.channel.send(generator_floe.get_sentence())
+	if "loulou" in message.content.lower():
+		await message.channel.send('[**Lou**] ' + generator_lou.get_sentence())
 
 	if 'florianne' in message.content.lower() and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
 		if message.author.name == 'Arth':
