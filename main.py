@@ -59,9 +59,9 @@ async def on_message(message):
 		if message.author.name == 'badria':
 			await message.channel.send('non badria je ne suis pas disponible les 3 prochains mois, prend RDV\n[Badria]: **ET J\'AI UN GUN**')
 		if message.author.name == 'shazam':
-			await message.channel.send('Plutot, je me demandais si je doit envoyer un message a vincent 🥺')
+			await message.channel.send('oui, et toi ? tu pécho bien en Allemagne ?')
 		if message.author.name == 'Sp00n':
-			await message.channel.send('C\'est quand qu\'on voit Oksana 🥰')
+			await message.channel.send('oui, et toi ? tu as couru combien de fois cette semaine ?')
 		if message.author.name == 'lucasmln':
 			await message.channel.send('Oh Lucas, cava mieux ?')
 		if message.author.name == 'jmdw':
@@ -89,7 +89,7 @@ def notify_channels():
 	slots = ["12h15", "12h30", "12h45", "13h00", "13h15", "13h30", "13h45"];
 	for channel in channel_list:
 		print(get_current_time() + ' notifying: ' + channel.name)
-		client.loop.create_task(channel.send('Le foodtruck est ouvert, ' + numpy.random.choice(slots, 1, p=[0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.1])[0] + ' vite !!! @everyone'))
+		client.loop.create_task(channel.send('Le foodtruck est ouvert, ' + numpy.random.choice(slots, 1, p=[0.1, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1])[0] + ' vite !!! @everyone'))
 
 def thread_ft():
 	food_truck_state = get_food_truck_state()
