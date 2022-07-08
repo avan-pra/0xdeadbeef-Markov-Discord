@@ -77,15 +77,20 @@ def get_current_time():
 
 def get_food_truck_state():
 	ws = WebSocket()
-	ws.connect(wsurl)
-	ws.recv()					# expect 'o'
-	ws.send(vmsg)				# sending connect message (version etc...)
-	ws.recv()					# server_id
-	ws.recv()					# connected session
-	truck_state = ws.recv()		# ???? food_truck state ?
-	ws.close()					# don't need ws anyore
-	jtruck_state = loads(loads(truck_state[1:])[0]) # double json.load
-	return int(jtruck_state['fields']['history'][0]['state']) # retreive 1st state value
+	try:
+		ws.connect(wsurl)
+		ws.recv()					# expect 'o'
+		ws.send(vmsg)				# sending connect message (version etc...)
+		ws.recv()					# server_id
+		ws.recv()					# connected session
+		truck_state = ws.recv()		# ???? food_truck state ?
+		ws.close()					# don't need ws anyore
+		jtruck_state = loads(loads(truck_state[1:])[0]) # double json.load
+		return int(jtruck_state['fields']['history'][0]['state']) # retreive 1st state value
+	except Exception as e:
+		print(get_current_time() + ' ', end='')
+		print(e)
+		return 1
 
 def notify_channels():
 	print(get_current_time() + ' notifying ' + str(len(channel_list)) + ' channels')
