@@ -15,15 +15,38 @@ wsurl = "wss://steakoverflow.42paris.fr/sockjs/999/ow2ptczb/websocket"
 vmsg = '["{\\"msg\\":\\"connect\\",\\"version\\":\\"1\\",\\"support\\":[\\"1\\",\\"pre2\\",\\"pre1\\"]}"]'
 client = discord.Client()
 channel_list = []
-generator_floe = markov.create('floe.txt')
-generator_lou = markov.create('lou.txt')
+
+generators = {}
+def update_generators():
+	global generators
+	files = os.listdir('./')
+	for file in files:
+		if file.endswith('.txt'):
+			generators[file[:-4]] = markov.create(file)
+update_generators()
+
+@client.event
+async def on_ready():
+	await client.change_presence(status=discord.Status.online, activity=discord.Game("so help"))
+	print(get_current_time() + " bot started")
 
 @client.event
 async def on_message(message):
 	if message.author == client.user:
 		return
 
-	if message.content == "steakoverflow register channel":
+	if message.content == "so help":
+		await message.channel.send(
+		'''
+**so help**								| print this meesage
+**so register channel**		  | subscribe channel to steakoverflow opened hours
+**so unregister channel** 	| remove channel from steakoverflow ping
+**so update**						   | update markov chain dataset
+**\*<discord name>\***		   | use markov chain to generate a sentence from the personne dataset (message posted by this user)
+		'''
+		)
+
+	if message.content == "so register channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				await message.channel.send('Error: channel already registered')
@@ -32,7 +55,7 @@ async def on_message(message):
 		print(get_current_time() + " registered channel " + message.channel.name)
 		await message.channel.send('Successfully registered channel')
 
-	if message.content == "steakoverflow unregister channel":
+	if message.content == "so unregister channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				channel_list.remove(stored_channel) # totally not optimized but erh
@@ -41,10 +64,39 @@ async def on_message(message):
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
-	if "floe" in message.content.lower():
-		await message.channel.send(generator_floe.get_sentence())
-	if "loulou" in message.content.lower():
-		await message.channel.send('[**Lou**] ' + generator_lou.get_sentence())
+	if message.content == "so update":
+		msg = await message.channel.send("updating...")
+		update_generators()
+		await msg.edit(content="done!")
+
+	# check if message contain one of the server member name
+	for word in message.content.split():
+		if word in generators.keys():
+
+			# create or get the webhook (used to impersonate)
+			webhook = None
+			try:
+				webhooks = await message.channel.webhooks()
+				for awebhook in webhooks:
+					if awebhook.token is not None and awebhook.name == "markov":
+						webhook = awebhook
+				if webhook == None:
+					webhook = await message.channel.create_webhook(name="markov")
+			except Exception as e:
+				await message.channel.send("Error: could not get webhook, add permission ?")
+				break
+
+			# get user account to impersonate, returns a list
+			user = await message.guild.query_members(query=word)
+			user = user[0]
+
+			# send the message
+			await webhook.send(content=generators[user.name].get_sentence(),
+				username=user.name,
+				avatar_url=user.avatar_url,
+				embed=None,
+				files=None
+			)
 
 	if 'florianne' in message.content.lower() and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
 		if message.author.name == 'Arth':
@@ -114,7 +166,9 @@ def thread_ft():
 		time.sleep(20)
 
 if __name__ == "__main__":
-	threading.Thread(target=thread_ft).start()
+	sonotify = threading.Thread(target=thread_ft)
+	sonotify.daemon = True
+	sonotify.start()
 	load_dotenv()
 	print(get_current_time() + ' thread started, launching bot')
 	client.run(os.getenv('discord_token'))
