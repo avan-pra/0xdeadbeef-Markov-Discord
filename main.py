@@ -20,10 +20,10 @@ generators = {}
 def update_generators():
 	global generators
 	generators = {}
-	files = os.listdir('./')
+	files = os.listdir('./db')
 	for file in files:
 		if file.endswith('.txt'):
-			generators[file[:-4]] = markov.create(file)
+			generators[file[:-4]] = markov.create('db/' + file)
 update_generators()
 
 @client.event
@@ -73,34 +73,36 @@ async def on_message(message):
 		else:
 			await message.channel.send("Error: not an admin")
 
-	# check if message contain one of the server member name
-	for word in message.content.split():
-		if word in generators.keys():
+	# we don't want to send a sentence if the message is from a webhook
+	if message.webhook_id == None:
+		# check if message contain one of the server member name
+		for word in message.content.split():
+			if word in generators.keys() + 'bot':
 
-			# create or get the webhook (used to impersonate)
-			webhook = None
-			try:
-				webhooks = await message.channel.webhooks()
-				for awebhook in webhooks:
-					if awebhook.token is not None and awebhook.name == "markov":
-						webhook = awebhook
-				if webhook == None:
-					webhook = await message.channel.create_webhook(name="markov")
-			except Exception as e:
-				await message.channel.send("Error: could not get webhook, add permission ?")
-				break
+				# create or get the webhook (used to impersonate)
+				webhook = None
+				try:
+					webhooks = await message.channel.webhooks()
+					for awebhook in webhooks:
+						if awebhook.token is not None and awebhook.name == "markov":
+							webhook = awebhook
+					if webhook == None:
+						webhook = await message.channel.create_webhook(name="markov")
+				except Exception as e:
+					await message.channel.send("Error: could not get webhook, add permission ?")
+					break
 
-			# get user account to impersonate, returns a list
-			user = await message.guild.query_members(query=word)
-			user = user[0]
-
-			# send the message
-			await webhook.send(content=generators[user.name].get_sentence(),
-				username=user.name,
-				avatar_url=user.avatar_url,
-				embed=None,
-				files=None
-			)
+				# get user account to impersonate, returns a list
+				user = await message.guild.query_members(query=word)
+				user = user[0]
+	
+				# send the message
+				await webhook.send(content=generators[user.name].get_sentence(),
+					username=user.name,
+					avatar_url=user.avatar_url,
+					embed=None,
+					files=None
+				)
 
 	if 'florianne' in message.content.lower() and ('ça va' in message.content.lower() or 'ca va' in message.content.lower() or 'cava' in message.content.lower() or 'comment tu vas' in message.content.lower() or 'ca dit quoi' in message.content.lower()):
 		if message.author.name == 'Arth':
