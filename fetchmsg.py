@@ -26,7 +26,7 @@ async def on_message(message):
 		return
 
 	for member in message.channel.members:
-		open('db/' + member.name + '.txt', 'a')
+		open('db/' + member.name + '.txt', 'a').close()
 	ulist = [x[:-4] + 'bot' for x in os.listdir('./db')]
 	# remove .gitkeep
 	ulist.pop()
@@ -36,12 +36,8 @@ async def on_message(message):
 	await pr.edit(content=get_current_time() + ' done fetch, parsing')
 	for msg in amsg:
 		# check if querying a bot
-		for word in msg.content.split():
-			for u in ulist:
-				if word in u:
-					msg.content = ''
 
-		if msg.content != '' or 'loulou' in msg.content or 'floe' in msg.content or msg.content.startswith('http'):
+		if len(msg.content) >= 2 and 'loulou' not in msg.content and 'floe' not in msg.content and msg.content.startswith('http') == False:
 			fd = open('db/' + msg.author.name + '.txt', 'a')
 			fd.write(msg.content.replace('\n', ' '))
 			fd.write('\n')

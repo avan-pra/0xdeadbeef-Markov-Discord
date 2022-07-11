@@ -82,10 +82,12 @@ class word:
 class awords:
 	'''contains all my words and manage them'''
 	words = []
+	wordslen = 0
 	s_word = None
 
 	def __init__(self):
 		self.words = []
+		self.wordslen = 0
 		self.s_word = None
 
 	def add(self, current, new):
@@ -113,6 +115,12 @@ class awords:
 	def set_starting_words(self, s_word):
 		self.s_word = s_word
 
+	def set_w_len(self, l):
+		self.wordslen = l
+
+	def get_w_len(self):
+		return self.wordslen
+
 	def get_sentence(self):
 		sentence = ''
 		word = self.s_word.get()
@@ -134,8 +142,12 @@ def create(filename):
 
 	lines = open(filename, 'r').readlines()
 	# loop through all line in file
+	length = 0
 	for line in lines:
 		line = line[:-1] # trim \n
+
+		# get amount off sample
+		length += 1
 
 		# new line, add starting word to list of starting word
 		s_word.add(line.split()[0])
@@ -155,6 +167,7 @@ def create(filename):
 	# a_words.printc()
 	
 	a_words.set_starting_words(s_word)
+	a_words.set_w_len(length)
 	return a_words
 
 if __name__ == "__main__":

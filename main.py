@@ -33,8 +33,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	if message.author == client.user:
+	if message.author == client.user or message.webhook_id != None:
 		return
+
+	store_message = True
 
 	if message.content == "so help":
 		await message.channel.send(
@@ -47,7 +49,7 @@ async def on_message(message):
 		'''
 		)
 
-	if message.content == "so register channel":
+	elif message.content == "so register channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				await message.channel.send('Error: channel already registered')
@@ -56,7 +58,7 @@ async def on_message(message):
 		print(get_current_time() + " registered channel " + message.channel.name)
 		await message.channel.send('Successfully registered channel')
 
-	if message.content == "so unregister channel":
+	elif message.content == "so unregister channel":
 		for stored_channel in channel_list:
 			if message.channel.id == stored_channel.id:
 				channel_list.remove(stored_channel) # totally not optimized but erh
@@ -65,7 +67,7 @@ async def on_message(message):
 				return
 		await message.channel.send('Error: could not find channel in the database')
 
-	if message.content == "so update":
+	elif message.content == "so update":
 		if message.author.guild_permissions.administrator == True:
 			msg = await message.channel.send("updating...")
 			update_generators()
@@ -73,30 +75,34 @@ async def on_message(message):
 		else:
 			await message.channel.send("Error: not an admin")
 
-	# we don't want to send a sentence if the message is from a webhook
-	if message.webhook_id == None:
-		# check if message contain one of the server member name
-		for word in message.content.split():
-			if word in generators.keys() + 'bot':
+	# check if message contain one of the server member name
+	for botname in list(generators.keys()):
+		if botname + 'bot' in message.content:
+			# do not store the message so that we dont create any shit dataset
+			store_message = False
+			# create or get the webhook (used to impersonate)
+			webhook = None
+			try:
+				webhooks = await message.channel.webhooks()
+				for awebhook in webhooks:
+					if awebhook.token is not None and awebhook.name == "markov":
+						webhook = awebhook
+				if webhook == None:
+					webhook = await message.channel.create_webhook(name="markov")
+			except Exception as e:
+				await message.channel.send("Error: could not get webhook, add permission ?")
+				break
 
-				# create or get the webhook (used to impersonate)
-				webhook = None
-				try:
-					webhooks = await message.channel.webhooks()
-					for awebhook in webhooks:
-						if awebhook.token is not None and awebhook.name == "markov":
-							webhook = awebhook
-					if webhook == None:
-						webhook = await message.channel.create_webhook(name="markov")
-				except Exception as e:
-					await message.channel.send("Error: could not get webhook, add permission ?")
-					break
+			# get user account to impersonate, returns a list
+			user = await message.guild.query_members(query=botname)
+			user = user[0]
 
-				# get user account to impersonate, returns a list
-				user = await message.guild.query_members(query=word)
-				user = user[0]
-	
-				# send the message
+			# send the message
+			content = None
+			# if less than 100 message print error
+			if generators[user.name].get_w_len() < 100:
+				await message.channel.send("Error: not enough sample")
+			else:
 				await webhook.send(content=generators[user.name].get_sentence(),
 					username=user.name,
 					avatar_url=user.avatar_url,
@@ -127,7 +133,13 @@ async def on_message(message):
 			await message.channel.send('Oh Lucas, cava mieux ?')
 		if message.author.name == 'jmdw':
 			await message.channel.send('Oui et toi Julien ? Tu as prepare ta 4eme dose ? https://www.sante.fr/cf/centres-vaccination-covid/departement-75-paris.html')
-	
+
+	elif len(message.content) >= 2 and message.content.startswith('http') == False and store_message == True:
+		# store message
+		fd = open('db/' + message.author.name + '.txt', 'a')
+		fd.write(message.content.replace('\n', ' ') + '\n')
+		fd.close()
+
 def get_current_time():
 	now = datetime.now()
 	current_time = now.strftime("%H:%M:%S")
