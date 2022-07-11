@@ -19,6 +19,7 @@ channel_list = []
 generators = {}
 def update_generators():
 	global generators
+	generators = {}
 	files = os.listdir('./')
 	for file in files:
 		if file.endswith('.txt'):
@@ -65,9 +66,12 @@ async def on_message(message):
 		await message.channel.send('Error: could not find channel in the database')
 
 	if message.content == "so update":
-		msg = await message.channel.send("updating...")
-		update_generators()
-		await msg.edit(content="done!")
+		if message.author.guild_permissions.administrator == True:
+			msg = await message.channel.send("updating...")
+			update_generators()
+			await msg.edit(content="done!")
+		else:
+			await message.channel.send("Error: not an admin")
 
 	# check if message contain one of the server member name
 	for word in message.content.split():
